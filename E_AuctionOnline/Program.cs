@@ -1,4 +1,5 @@
 ﻿using ApplicationLayer;
+using DomainLayer.Core;
 using InfrastructureLayer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -17,15 +18,17 @@ builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     //x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
-//builder.Services.AddMvc().AddJsonOptions(options => {
-//    options.JsonSerializerOptions.MaxDepth = 64; // or however deep you need
-//    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-//});
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 //jwt token
+var appSettings = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .Build();
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,12 +43,16 @@ builder.Services.AddAuthentication(x =>
     x.TokenValidationParameters = new TokenValidationParameters
     {      
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my21charSuperSecretKeyForMy21charSuperSecretKey")),      
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings["IssuerSigningKey"])),      
         ValidateAudience = false,    
         ValidateIssuer = false,   
         ClockSkew = TimeSpan.Zero,
     };
 });
+
+//cloudinary 
+builder.Services.Configure<CloudKey>(builder.Configuration.GetSection("CloudinarySetting"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
