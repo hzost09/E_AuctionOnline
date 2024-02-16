@@ -26,6 +26,10 @@ namespace ApplicationLayer
             service.AddScoped<IAuthService, AuthService>();
             //jwt service
             service.AddScoped<IJwtService, JWTservice>();
+            //user service
+            service.AddScoped<IUserService, UserService>();
+            //photo service
+            service.AddScoped<IphotoService, PhotoService>();
             return service;
         }
     }
