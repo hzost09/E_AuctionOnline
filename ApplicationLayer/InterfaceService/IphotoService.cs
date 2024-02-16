@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace ApplicationLayer.InterfaceService
 {
-    internal interface IphotoService
+    public interface IphotoService
     {
         Task<string> addPhoto(IFormFile file);
         Task<DeletionResult> DeletPhoto(string file);
-        Task<string> WriteFile(IFormFile file);
-        Task DeleteFile(string filename);
+       
     }
 }

@@ -8,10 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using DomainLayer.Core;
+using ApplicationLayer.InterfaceService;
 
 namespace ApplicationLayer.Service
 {
-    public class PhotoService
+    public class PhotoService:IphotoService
     {
         private readonly Cloudinary _c;
         public PhotoService(IOptions<CloudKey> config)
