@@ -31,7 +31,7 @@ namespace DomainLayer.Core.Enities
         //making relationship
         [ForeignKey("sellerId")]
         public virtual User? Seller { get; set; }
-        public int sellerId { get; set; }
+        public int? sellerId { get; set; }
         
         public ICollection<CateItem>? cateItems { get; set; }
 

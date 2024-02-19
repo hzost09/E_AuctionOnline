@@ -151,9 +151,6 @@ namespace ApplicationLayer.Service
             try
             {               
                 var findcateItem = await _u.Repository<CateItem>().EntitiesCondition().FirstOrDefaultAsync(x => x.CateId == CategoryId && x.ItemId == ItemId);
-                if (findcateItem == null) { 
-                    return false;
-                }
                 if (findcateItem == null)
                 {
                     var CreatCateItem = new CateItem();

@@ -28,5 +28,7 @@ namespace DomainLayer.Core.Enities
         public Rating? Rating { get; set; }  
 
         public  ICollection<Bid>? bids { get; set; }
+
+        public virtual ICollection<AuctionHistory>? AuctionHistories { get; set; }
     }
 }

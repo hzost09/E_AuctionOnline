@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfrastructureLayer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240212152222_V0")]
+    [Migration("20240218095834_V0")]
     partial class V0
     {
         /// <inheritdoc />
@@ -45,7 +45,7 @@ namespace InfrastructureLayer.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WinnerId")
+                    b.Property<int?>("WinnerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -283,7 +283,6 @@ namespace InfrastructureLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
@@ -378,14 +377,12 @@ namespace InfrastructureLayer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Document")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -398,7 +395,7 @@ namespace InfrastructureLayer.Migrations
                     b.Property<float>("WinningPrice")
                         .HasColumnType("real");
 
-                    b.Property<int>("sellerId")
+                    b.Property<int?>("sellerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -779,10 +776,8 @@ namespace InfrastructureLayer.Migrations
                         .IsRequired();
 
                     b.HasOne("DomainLayer.Core.Enities.User", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("AuctionHistories")
+                        .HasForeignKey("WinnerId");
 
                     b.Navigation("Item");
 
@@ -843,8 +838,7 @@ namespace InfrastructureLayer.Migrations
                     b.HasOne("DomainLayer.Core.Enities.User", "Seller")
                         .WithMany("soldItem")
                         .HasForeignKey("sellerId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.Navigation("Seller");
                 });
@@ -923,6 +917,8 @@ namespace InfrastructureLayer.Migrations
 
             modelBuilder.Entity("DomainLayer.Core.Enities.User", b =>
                 {
+                    b.Navigation("AuctionHistories");
+
                     b.Navigation("EmailToken");
 
                     b.Navigation("Rating");

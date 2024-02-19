@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace InfrastructureLayer.Repos
 {
-    internal class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly DataContext _db;
         private readonly IDictionary<Type, dynamic> _listRepos;

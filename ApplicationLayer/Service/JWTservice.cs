@@ -1,6 +1,7 @@
 ﻿using ApplicationLayer.InterfaceService;
 using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -31,7 +32,7 @@ namespace ApplicationLayer.Service
             var key = Encoding.ASCII.GetBytes(_config["IssuerSigningKey"]);
             // tạo playload chứa name và role
        
-            var userRole = await _u.Repository<User>().GetUserByEmail<User>(user.Email);
+            var userRole = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == user.Email);
             var identity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.Role,userRole.Role),
@@ -82,7 +83,7 @@ namespace ApplicationLayer.Service
         public async Task<ReFreshToken> RefreshAccessToken(string token)
         {
             var unquiname = dataFormToken(token);         
-            var user = await _u.Repository<User>().GetUserByName<User>(unquiname);
+            var user = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Name == unquiname);
             var findTokenWithUserId = await _u.Repository<ReFreshToken>().GetById(user.Id);   
             if (findTokenWithUserId.Token == null || findTokenWithUserId.EndDate <= DateTime.Now)
             {

@@ -10,7 +10,7 @@ namespace DomainLayer.Core.Enities
     {
         public int Id { get; set; } 
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         //making relationship
         public ICollection<CateItem>? cateItems { get; set; }

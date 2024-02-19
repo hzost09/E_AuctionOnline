@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace InfrastructureLayer.Repos
         {
             return _data.Set<T>();
         }
-
+    
         //get one by id
         public async Task<T> GetById(int id)
         {
@@ -56,26 +57,13 @@ namespace InfrastructureLayer.Repos
             _data.Remove(entity);
         }
 
-        //get by User by email
-        public async Task<T> GetUserByEmail<T>(string email) where T : User 
-        {
-            var entities = await _data.Set<T>().FirstOrDefaultAsync(x => x.Email == email);
-            return entities;
-        }
+        // test some codition with Iqueryable 
+        //public async Task<IList<T>> ListEntitieshaveCondition(Expression<Func<T, bool>> condition)
+        //{
+        //    return await EntitiesCondition().ToListAsync();
+        //}
+        //get somthing with condition
 
-        // get by User by Name
-        public async Task<T> GetUserByName<T>(string Name) where T : User
-        {
-            var entities = await _data.Set<T>().FirstOrDefaultAsync(x => x.Name == Name);
-            return entities;
-        }
-        
-        // get item by name
-        public async Task<IList<T>> getItembyName<T>(string name) where T : Item
-        {
-            var entities = await _data.Set<T>().Where(x => x.Name.Contains(name)).ToListAsync();
-            return entities;
-        }
-        
+
     }
 }

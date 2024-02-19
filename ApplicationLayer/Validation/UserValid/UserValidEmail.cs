@@ -2,6 +2,7 @@
 using ApplicationLayer.Validation.RegisterValid;
 using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,18 +15,18 @@ namespace ApplicationLayer.Validation.UserValid
 {
     public class UserValidEmail : IUserValidChain
     {
-        private readonly IUnitOfWork _u;
+        private readonly IUnitOfWork _u ;
+
         public UserValidEmail(IUnitOfWork u)
         {
              _u = u;    
         }
-        public async Task<(bool, string)> validateChain(UserModel model)
+     
+        public async Task<(bool, string)> validateUserChain(UserModel model)
         {
-            var findEmail = await _u.Repository<User>().GetUserByEmail<User>(model.Email);
-            if (findEmail != null)
+            if (model == null)
             {
-                throw new ValidationException("Email is Exit pls chose other Email");
-
+                throw new ValidationException("The Model is required");
             }
             if (model.Email == null)
             {
@@ -34,6 +35,13 @@ namespace ApplicationLayer.Validation.UserValid
             if (!IsValidEmail(model.Email))
             {
                 throw new ValidationException("Invalid Email");
+            }
+               
+            var test = new UserValidEmail(_u);
+            var findEmail =  test._u.Repository<User>().EntitiesCondition().Any(x => x.Email == model.Email);
+            if (findEmail == true)
+            {
+                throw new ValidationException("Email is Exit pls chose other Email");
             }
             return (true, "");
         }
@@ -46,7 +54,7 @@ namespace ApplicationLayer.Validation.UserValid
     }
     public class NameValidate : IUserValidChain
     {
-        public async Task<(bool, string)> validateChain(UserModel model)
+        public async Task<(bool, string)> validateUserChain(UserModel model)
         {
             if (model.Name == "" || model.Name == null)
             {

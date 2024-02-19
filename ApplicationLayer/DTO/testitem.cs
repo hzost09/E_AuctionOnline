@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 
 namespace ApplicationLayer.DTO
 {
-    public class UserModel
+    public class testitem
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public IFormFile AvatarFile { get; set; }   
+        public IFormFile item { get; set; }
     }
 }

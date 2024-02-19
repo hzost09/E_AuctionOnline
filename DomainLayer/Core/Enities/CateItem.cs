@@ -13,11 +13,11 @@ namespace DomainLayer.Core.Enities
 
         //making relationship
         [ForeignKey("CateId")]
-        public Category category { get; set; }
+        public Category? category { get; set; }
         public int CateId { get; set; }
 
         [ForeignKey("ItemId")]
-        public Item item { get; set; }
+        public Item? item { get; set; }
         public int ItemId { get; set; } 
     }
 }

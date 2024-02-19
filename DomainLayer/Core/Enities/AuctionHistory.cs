@@ -19,7 +19,7 @@ namespace DomainLayer.Core.Enities
 
         [ForeignKey("WinnerId")]
         public User? Winner { get; set; }    
-        public int WinnerId { get; set; }
+        public int? WinnerId { get; set; }
       
     }
 }
