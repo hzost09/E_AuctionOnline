@@ -3,6 +3,7 @@ using ApplicationLayer.InterfaceService;
 using ApplicationLayer.Validation.LoginValid;
 using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,7 +27,7 @@ namespace ApplicationLayer.Service
         {
             try
             {            
-                var findUser = await _Iu.Repository<User>().GetUserByEmail<User>(model.Email);
+                var findUser = await _Iu.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == model.Email);
                 if (findUser == null)
                 {
                     return (null, "User not Found");

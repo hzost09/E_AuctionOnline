@@ -13,7 +13,7 @@ namespace DomainLayer.Core.Enities
         public float BidAmount { get; set; }
         //making relationship
         [ForeignKey("UserId")]
-        public User User { get; set; }
+        public User? User { get; set; }
         public int UserId { get; set; }
 
         [ForeignKey("ItemId")]

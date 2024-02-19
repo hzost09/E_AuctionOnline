@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApplicationLayer.Validation.ItemValid
+namespace ApplicationLayer.DTO
 {
-    public class ItemPopertyVadlidate
+    public class CategoryModel
     {
+        public int Id { get; set; } 
     }
 }

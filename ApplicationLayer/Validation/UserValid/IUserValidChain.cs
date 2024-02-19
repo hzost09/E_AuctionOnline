@@ -9,6 +9,6 @@ namespace ApplicationLayer.Validation.UserValid
 {
     public interface IUserValidChain
     {
-        Task<(bool, string)> validateChain(UserModel model);
+        Task<(bool, string)> validateUserChain(UserModel model);
     }
 }
