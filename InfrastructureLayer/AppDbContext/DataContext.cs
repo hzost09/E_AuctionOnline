@@ -42,7 +42,8 @@ namespace InfrastructureLayer.AppDbContext
                     Name = "User1",
                     Password = "User1234",
                     Email = "User1@gmail.com",
-                    Role = "User"
+                    Role = "User",
+                    EmailConfirm = false,
                 },
                    new User
                    {
@@ -50,7 +51,8 @@ namespace InfrastructureLayer.AppDbContext
                        Name = "User2",
                        Password = "User1234",
                        Email = "User2@gmail.com",
-                       Role = "User"
+                       Role = "User",
+                       EmailConfirm = false,
                    },
                       new User
                       {
@@ -58,7 +60,8 @@ namespace InfrastructureLayer.AppDbContext
                           Name = "User3",
                           Password = "User1234",
                           Email = "User3@gmail.com",
-                          Role = "User"
+                          Role = "User",
+                          EmailConfirm = false,
                       },
                          new User
                          {
@@ -66,7 +69,8 @@ namespace InfrastructureLayer.AppDbContext
                              Name = "User4",
                              Password = "User1234",
                              Email = "User4@gmail.com",
-                             Role = "User"
+                             Role = "User",
+                             EmailConfirm = false,
                          },
                             new User
                             {
@@ -74,7 +78,8 @@ namespace InfrastructureLayer.AppDbContext
                                 Name = "User5",
                                 Password = "User1234",
                                 Email = "User5@gmail.com",
-                                Role = "User"
+                                Role = "User",
+                                EmailConfirm = false,
                             },
                                new User
                                {
@@ -82,7 +87,8 @@ namespace InfrastructureLayer.AppDbContext
                                    Name = "User6",
                                    Password = "User1234",
                                    Email = "User6@gmail.com",
-                                   Role = "User"
+                                   Role = "User",
+                                   EmailConfirm = false,
                                },
                                   new User
                                   {
@@ -90,7 +96,8 @@ namespace InfrastructureLayer.AppDbContext
                                       Name = "User7",
                                       Password = "User1234",
                                       Email = "User7@gmail.com",
-                                      Role = "User"
+                                      Role = "User",
+                                      EmailConfirm = false,
                                   }, 
                                   new User
                                   {
@@ -98,7 +105,8 @@ namespace InfrastructureLayer.AppDbContext
                                       Name = "User8",
                                       Password = "User1234",
                                       Email = "User8@gmail.com",
-                                      Role = "User"
+                                      Role = "User",
+                                      EmailConfirm = false,
                                   }, 
                                   new User
                                   {
@@ -106,7 +114,8 @@ namespace InfrastructureLayer.AppDbContext
                                       Name = "User9",
                                       Password = "User1234",
                                       Email = "User@gmail.com",
-                                      Role = "User"
+                                      Role = "User",
+                                      EmailConfirm = false,
                                   }, 
                                   new User
                                   {
@@ -114,7 +123,8 @@ namespace InfrastructureLayer.AppDbContext
                                       Name = "User10",
                                       Password = "User1234",
                                       Email = "User10@gmail.com",
-                                      Role = "User"
+                                      Role = "User",
+                                      EmailConfirm = false,
                                   },
                                   new User
                                   {
@@ -122,7 +132,8 @@ namespace InfrastructureLayer.AppDbContext
                                       Name = "Admin",
                                       Password = "Admin1234",
                                       Email = "Admin@gmail.com",
-                                      Role = "Admin"
+                                      Role = "Admin",
+                                      EmailConfirm = true,
                                   }
                 );
             modelBuilder.Entity<Item>().HasData(
@@ -430,7 +441,67 @@ namespace InfrastructureLayer.AppDbContext
                                                         CateId = 3,
                                                         ItemId = 10,
                                                     }
-
+                );
+            modelBuilder.Entity<AuctionHistory>().HasData(
+                new AuctionHistory { 
+                    Id = 1,
+                    HighestBid = 10,
+                    ItemId = 1
+                },
+                   new AuctionHistory
+                   {
+                       Id = 2,
+                       HighestBid = 10,
+                       ItemId = 2
+                   },
+                      new AuctionHistory
+                      {
+                          Id = 3,
+                          HighestBid = 10,
+                          ItemId = 3
+                      },
+                         new AuctionHistory
+                         {
+                             Id = 4,
+                             HighestBid = 10,
+                             ItemId = 4
+                         },
+                            new AuctionHistory
+                            {
+                                Id = 5,
+                                HighestBid = 10,
+                                ItemId = 5
+                            },
+                               new AuctionHistory
+                               {
+                                   Id = 6,
+                                   HighestBid = 10,
+                                   ItemId = 6
+                               },
+                                  new AuctionHistory
+                                  {
+                                      Id = 7,
+                                      HighestBid = 10,
+                                      ItemId = 7
+                                  },
+                                     new AuctionHistory
+                                     {
+                                         Id = 8,
+                                         HighestBid = 10,
+                                         ItemId = 8
+                                     },
+                                        new AuctionHistory
+                                        {
+                                            Id = 9,
+                                            HighestBid = 10,
+                                            ItemId = 9
+                                        },
+                                           new AuctionHistory
+                                           {
+                                               Id = 10,
+                                               HighestBid = 10,
+                                               ItemId = 10
+                                           }
                 );
             // Configure the relationship between Category and CategoryItem
             modelBuilder.Entity<Category>()
@@ -465,7 +536,21 @@ namespace InfrastructureLayer.AppDbContext
                 .HasMany(c => c.soldItem)
                 .WithOne(ci => ci.Seller)
                 .HasForeignKey(ci => ci.sellerId)
-                .OnDelete(DeleteBehavior.ClientCascade);       
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+            // Configure the relationship User and Rating
+            modelBuilder.Entity<Rating>()
+     .HasOne(r => r.RateUser)
+     .WithMany(u => u.Rater)
+     .HasForeignKey(r => r.RateUserId)
+     .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Rating>()
+                .HasOne(r => r.seller)
+                .WithMany(u => u.BeingRateds)
+                .HasForeignKey(r => r.SellerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 

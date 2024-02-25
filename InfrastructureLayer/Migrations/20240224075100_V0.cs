@@ -55,6 +55,7 @@ namespace InfrastructureLayer.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirm = table.Column<bool>(type: "bit", nullable: true),
                     BeginDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -135,12 +136,34 @@ namespace InfrastructureLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VerifyEmail",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VerifyToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    BeginDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VerifyEmail", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VerifyEmail_Usertb_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Usertb",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AuctionHistory",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    HighestBid = table.Column<float>(type: "real", nullable: false),
+                    HighestBid = table.Column<float>(type: "real", nullable: true),
                     ItemId = table.Column<int>(type: "int", nullable: false),
                     WinnerId = table.Column<int>(type: "int", nullable: true),
                     BeginDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -255,6 +278,10 @@ namespace InfrastructureLayer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemId = table.Column<int>(type: "int", nullable: false),
                     SellerId = table.Column<int>(type: "int", nullable: false),
+                    RateUserId = table.Column<int>(type: "int", nullable: false),
+                    Rate = table.Column<float>(type: "real", nullable: false),
+                    RatingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RatedUserId = table.Column<int>(type: "int", nullable: true),
                     BeginDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -268,11 +295,15 @@ namespace InfrastructureLayer.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Ratingtb_Usertb_RateUserId",
+                        column: x => x.RateUserId,
+                        principalTable: "Usertb",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Ratingtb_Usertb_SellerId",
                         column: x => x.SellerId,
                         principalTable: "Usertb",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -289,20 +320,20 @@ namespace InfrastructureLayer.Migrations
 
             migrationBuilder.InsertData(
                 table: "Usertb",
-                columns: new[] { "Id", "Avatar", "BeginDate", "Email", "EndDate", "Name", "Password", "Role" },
+                columns: new[] { "Id", "Avatar", "BeginDate", "Email", "EmailConfirm", "EndDate", "Name", "Password", "Role" },
                 values: new object[,]
                 {
-                    { 1, null, null, "User1@gmail.com", null, "User1", "User1234", "User" },
-                    { 2, null, null, "User2@gmail.com", null, "User2", "User1234", "User" },
-                    { 3, null, null, "User3@gmail.com", null, "User3", "User1234", "User" },
-                    { 4, null, null, "User4@gmail.com", null, "User4", "User1234", "User" },
-                    { 5, null, null, "User5@gmail.com", null, "User5", "User1234", "User" },
-                    { 6, null, null, "User6@gmail.com", null, "User6", "User1234", "User" },
-                    { 7, null, null, "User7@gmail.com", null, "User7", "User1234", "User" },
-                    { 8, null, null, "User8@gmail.com", null, "User8", "User1234", "User" },
-                    { 9, null, null, "User@gmail.com", null, "User9", "User1234", "User" },
-                    { 10, null, null, "User10@gmail.com", null, "User10", "User1234", "User" },
-                    { 11, null, null, "Admin@gmail.com", null, "Admin", "Admin1234", "Admin" }
+                    { 1, null, null, "User1@gmail.com", false, null, "User1", "User1234", "User" },
+                    { 2, null, null, "User2@gmail.com", false, null, "User2", "User1234", "User" },
+                    { 3, null, null, "User3@gmail.com", false, null, "User3", "User1234", "User" },
+                    { 4, null, null, "User4@gmail.com", false, null, "User4", "User1234", "User" },
+                    { 5, null, null, "User5@gmail.com", false, null, "User5", "User1234", "User" },
+                    { 6, null, null, "User6@gmail.com", false, null, "User6", "User1234", "User" },
+                    { 7, null, null, "User7@gmail.com", false, null, "User7", "User1234", "User" },
+                    { 8, null, null, "User8@gmail.com", false, null, "User8", "User1234", "User" },
+                    { 9, null, null, "User@gmail.com", false, null, "User9", "User1234", "User" },
+                    { 10, null, null, "User10@gmail.com", false, null, "User10", "User1234", "User" },
+                    { 11, null, null, "Admin@gmail.com", true, null, "Admin", "Admin1234", "Admin" }
                 });
 
             migrationBuilder.InsertData(
@@ -320,6 +351,23 @@ namespace InfrastructureLayer.Migrations
                     { 8, null, 10f, "des for item8", "a", null, "https://res.cloudinary.com/dcxzqj0ta/image/upload/v1706760311/nulybxknb3bsdbgwbjxt.png", "item8", 2f, 20f, 8 },
                     { 9, null, 10f, "des for item9", "a", null, "https://res.cloudinary.com/dcxzqj0ta/image/upload/v1706760311/nulybxknb3bsdbgwbjxt.png", "item9", 2f, 20f, 9 },
                     { 10, null, 10f, "des for item10", "a", null, "https://res.cloudinary.com/dcxzqj0ta/image/upload/v1706760311/nulybxknb3bsdbgwbjxt.png", "item10", 2f, 20f, 10 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AuctionHistory",
+                columns: new[] { "Id", "BeginDate", "EndDate", "HighestBid", "ItemId", "WinnerId" },
+                values: new object[,]
+                {
+                    { 1, null, null, 10f, 1, null },
+                    { 2, null, null, 10f, 2, null },
+                    { 3, null, null, 10f, 3, null },
+                    { 4, null, null, 10f, 4, null },
+                    { 5, null, null, 10f, 5, null },
+                    { 6, null, null, 10f, 6, null },
+                    { 7, null, null, 10f, 7, null },
+                    { 8, null, null, 10f, 8, null },
+                    { 9, null, null, 10f, 9, null },
+                    { 10, null, null, 10f, 10, null }
                 });
 
             migrationBuilder.InsertData(
@@ -418,16 +466,27 @@ namespace InfrastructureLayer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Ratingtb_RateUserId",
+                table: "Ratingtb",
+                column: "RateUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Ratingtb_SellerId",
                 table: "Ratingtb",
-                column: "SellerId",
-                unique: true);
+                column: "SellerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReFreshTokenstb_UserId",
                 table: "ReFreshTokenstb",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerifyEmail_UserId",
+                table: "VerifyEmail",
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -453,6 +512,9 @@ namespace InfrastructureLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReFreshTokenstb");
+
+            migrationBuilder.DropTable(
+                name: "VerifyEmail");
 
             migrationBuilder.DropTable(
                 name: "Catagorytb");

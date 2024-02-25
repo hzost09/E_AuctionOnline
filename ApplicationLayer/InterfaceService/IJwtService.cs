@@ -1,4 +1,5 @@
-﻿using DomainLayer.Core.Enities;
+﻿using DomainLayer.Core;
+using DomainLayer.Core.Enities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace ApplicationLayer.InterfaceService
         Task<ReFreshToken> createRrefreshtoken(int id);
         Task<ReFreshToken> RefreshAccessToken(string token);
         string dataFormToken(string token);
+        Task<VerifyEmail> createVerifytoken(string email);
     }
 }

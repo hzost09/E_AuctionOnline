@@ -1,10 +1,12 @@
 ﻿using ApplicationLayer.InterfaceService;
 using DomainLayer.Core.Enities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_AuctionOnline.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -139,6 +141,81 @@ namespace E_AuctionOnline.Controllers
             }
         }
         
+        //create category
+        [Route("CreateCategory")]
+        [HttpPost]
+        public async Task<IActionResult> createCategory(Category cate)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new {message = ModelState});
+            }
+            var result = await _ad.CreateCategory(cate);
+            if (result.Item1 == -1)
+            {
+                return BadRequest(new
+                {
+                    message = result.Item2
+                });
+            }
+            else
+            {
+                return Ok(new
+                {
+                    message = result.Item2
+                });
+            }
+        }
+
+        //update category
+        [Route("UpdateCategory")]
+        [HttpPost]        
+        public async Task<IActionResult> UpdateCategory(Category Cate)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = ModelState });
+            }
+            var checkcategory = await _ad.UpdateCategory(Cate);
+            if (checkcategory.Item1 == null)
+            {
+                return BadRequest(new
+                {
+                    message = checkcategory.Item2
+                });
+            }
+            else
+            {
+                return Ok(new
+                {
+                    message = checkcategory.Item1
+                });
+            }
+        }
+
+        //category with listitem
+        [Route("categorywithlistitem")]
+        [HttpPost]
+        public async Task<IActionResult> categorylistitem(int categoryid)
+        {
+            var result = await _ad.categoryWithitemList(categoryid);
+            if(result.Item1 == null) {
+                return BadRequest(new
+                {
+                    message = "Cant Find category"
+                });
+            }
+            else
+            {
+                return Ok(new
+                {
+                    Category = result.Item1,
+                    listItem = result.Item2 
+                });
+            }
+
+        }
+
 
     }
 }

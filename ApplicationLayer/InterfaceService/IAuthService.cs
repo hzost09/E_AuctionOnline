@@ -12,5 +12,6 @@ namespace ApplicationLayer.InterfaceService
     {
         Task<(User, string)> login(LoginModel model);
         Task<(int, string)> Register(SignUpModel model);
+        Task<(int, string)> confrimVerify(verifymodel model);
     }
 }

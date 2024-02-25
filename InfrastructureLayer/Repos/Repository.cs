@@ -32,7 +32,7 @@ namespace InfrastructureLayer.Repos
         }
     
         //get one by id
-        public async Task<T> GetById(int id)
+        public async Task<T> GetById(int? id)
         {
             var Entities = await _data.Set<T>().FindAsync(id);
             return Entities;

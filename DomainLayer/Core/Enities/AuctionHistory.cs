@@ -10,7 +10,7 @@ namespace DomainLayer.Core.Enities
     public class AuctionHistory : BaseEntity
     {
         public int Id { get; set; }
-        public float HighestBid { get; set; }
+        public float? HighestBid { get; set; }
 
         //making relationship
         [ForeignKey("ItemId")]

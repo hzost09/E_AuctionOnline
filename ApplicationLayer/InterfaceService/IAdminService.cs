@@ -16,5 +16,8 @@ namespace ApplicationLayer.InterfaceService
         Task<IList<ItemModel>> SearchbyName(string name);
         Task<(bool,string)> LockOrUnlockUser(int id);
         Task<bool> addOrDeleteItemForCate(int CategoryId, int ItemId);
+        Task<(int, string)> CreateCategory(Category cate);
+        Task<(Category, string)> UpdateCategory(Category cate);
+        Task<(Category, IList<Item>)> categoryWithitemList(int id);
     }
 }
