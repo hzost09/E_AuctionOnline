@@ -1,6 +1,5 @@
 ﻿using ApplicationLayer.InterfaceService;
 using ApplicationLayer.Service;
-using ApplicationLayer.Validation.BidValid;
 using ApplicationLayer.Validation.ItemValid;
 using ApplicationLayer.Validation.LoginValid;
 using ApplicationLayer.Validation.RegisterValid;
@@ -21,7 +20,6 @@ namespace ApplicationLayer
             service.AddScoped<ISignUpChain, SignUpEmailValidate>();
             service.AddScoped<ISignUpChain, SignUpPaswordValidate>();
             service.AddScoped<ISignUpChain, SignUpUserNameValidate>();
-            service.AddScoped<ISignUpChain, SignUpPaswordValidate>();
             //validate for Item
             service.AddScoped<IItemValidChain,ItemNameValidate >();
             service.AddScoped<IItemValidChain, ItemPriceValidate>();
@@ -32,10 +30,8 @@ namespace ApplicationLayer
             //validate for User
             service.AddScoped<IUserValidChain, UserValidEmail>();
             service.AddScoped<IUserValidChain, NameValidate>();
-            // validate for placebid
-            service.AddScoped<IBidValidChain, BidAmountValid>();
-            service.AddScoped<IBidValidChain, BidTimeValid>();
-            service.AddScoped<IBidValidChain, BidWinnerValid>();
+
+            service.AddScoped<ISignUpChain, SignUpPaswordValidate>();
             //Admin service
             service.AddScoped<IAdminService, AdminService>();
             // Auth service
@@ -48,8 +44,6 @@ namespace ApplicationLayer
             service.AddScoped<IphotoService, PhotoService>();
             //document service
             service.AddScoped<IDocument, DocumentService>();
-            //reset password service
-            service.AddScoped<IResetEmailService, ResetWithEmailService>();
             return service;
         }
     }

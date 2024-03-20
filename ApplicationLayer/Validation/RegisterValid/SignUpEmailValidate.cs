@@ -1,8 +1,5 @@
 ﻿using ApplicationLayer.DTO;
 using ApplicationLayer.Validation.RegisterValid;
-using DomainLayer.Core.Enities;
-using DomainLayer.Imterface;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,11 +12,6 @@ namespace ApplicationLayer.Validation.RegisterValid
 {
     public class SignUpEmailValidate : ISignUpChain
     {
-        private readonly IUnitOfWork _u;
-        public SignUpEmailValidate(IUnitOfWork u)
-        {
-            _u = u;
-        }
         public async Task<(bool, string)> validateSignUpChain(SignUpModel model)
         {
             if (model.Email == null)
@@ -29,11 +21,6 @@ namespace ApplicationLayer.Validation.RegisterValid
             if (!IsValidEmail(model.Email))
             {
                 throw new ValidationException("Invalid Email");       
-            }
-            var findEmailExit = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == model.Email);
-            if (findEmailExit != null && findEmailExit.EmailConfirm == true)
-            {
-                throw new ValidationException("Email exited change to other Email");
             }
             return (true, "");
         }
