@@ -10,7 +10,7 @@ namespace DomainLayer.Imterface
     public interface IRepository<T>
     {
         Task<IList<T>> ListEntities();
-        Task<T> GetById(int? id);         
+        Task<T> GetById(int id);         
         Task<T> Create(T entity);
         void UpDate(T entity);
         void Delete(T entity);

@@ -1,10 +1,8 @@
 ﻿using ApplicationLayer.InterfaceService;
-using DomainLayer.Core;
 using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -46,7 +44,7 @@ namespace ApplicationLayer.Service
             var des = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddSeconds(40000),
+                Expires = DateTime.Now.AddSeconds(3000),
                 SigningCredentials = cerdential
             };
             var token = jwtHandeler.CreateToken(des);
@@ -58,12 +56,12 @@ namespace ApplicationLayer.Service
 
         public async Task<ReFreshToken> createRrefreshtoken(int id)
         {        
-            var existingToken = await _u.Repository<ReFreshToken>().EntitiesCondition().FirstOrDefaultAsync(x => x.UserId == id);
+            var existingToken = await _u.Repository<ReFreshToken>().GetById(id);
             if (existingToken != null)
             {
                 existingToken.Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
                 existingToken.BeginDate = DateTime.Now;
-                existingToken.EndDate = DateTime.Now.AddSeconds(100);
+                existingToken.EndDate = DateTime.Now.AddSeconds(7000);
                 _u.Repository<ReFreshToken>().UpDate(existingToken);
                 return existingToken;
             }
@@ -71,7 +69,7 @@ namespace ApplicationLayer.Service
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 BeginDate = DateTime.Now,
-                EndDate = DateTime.Now.AddSeconds(70000),
+                EndDate = DateTime.Now.AddSeconds(700000),
                 UserId = id
             };
             await _u.Repository<ReFreshToken>().Create(refreshtoken);
@@ -118,34 +116,5 @@ namespace ApplicationLayer.Service
             return "";
         }
 
-        public async Task<VerifyEmail> createVerifytoken(string email)
-        {
-            var findUser = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == email);
-            if (findUser == null)
-            {
-                return null;
-            }
-            var existingToken = await _u.Repository<VerifyEmail>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == findUser.Email);
-            if (existingToken != null)
-            {
-                existingToken.VerifyToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-                existingToken.BeginDate = DateTime.Now;
-                existingToken.EndDate = DateTime.Now.AddSeconds(70000);
-                 _u.Repository<VerifyEmail>().UpDate(existingToken);
-                await _u.SaveChangesAsync();
-                return existingToken;
-            }
-            var verifytoken = new VerifyEmail()
-            {
-                VerifyToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                BeginDate = DateTime.Now,
-                EndDate = DateTime.Now.AddSeconds(70000),
-                Email = findUser.Email,
-                UserId = findUser.Id
-            };
-            await _u.Repository<VerifyEmail>().Create(verifytoken);
-            await _u.SaveChangesAsync();
-            return verifytoken;
-        }
     }
 }

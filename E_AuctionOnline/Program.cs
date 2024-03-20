@@ -52,13 +52,6 @@ builder.Services.AddAuthentication(x =>
 
 //cloudinary 
 builder.Services.Configure<CloudKey>(builder.Configuration.GetSection("CloudinarySetting"));
-//Cors
-builder.Services.AddCors(opt => opt.AddPolicy(name: "mypolicy",
-        policy =>
-        {
-            policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(appSettings["ClientUrl"] ?? "*");
-        }
-    ));
 
 var app = builder.Build();
 
@@ -69,10 +62,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("mypolicy");
 app.UseHttpsRedirection();
-app.UseAuthentication();
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
