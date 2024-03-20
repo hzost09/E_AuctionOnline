@@ -101,9 +101,9 @@ namespace E_AuctionOnline.Controllers
         }
         [Route("checkemailandsendlink")]
         [HttpPost]
-        public async Task<IActionResult> checkemailandsendlink(string email)
+        public async Task<IActionResult> checkemailandsendlink([FromBody]EmailDTOmodel model)
         {
-            var checkEmail = await _r.CheckEmailAndTokenEmail(email);
+            var checkEmail = await _r.CheckEmailAndTokenEmail(model.Email);
             if (checkEmail == null)
             {
                 return BadRequest(new

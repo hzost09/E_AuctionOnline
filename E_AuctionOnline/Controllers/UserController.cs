@@ -33,7 +33,8 @@ namespace E_AuctionOnline.Controllers
             _r = r;
             _j = j;
         }
-
+        
+        
         [Route("getlistcategory")]
         [HttpGet]
         public async Task<IActionResult> getlistCategory()
@@ -48,7 +49,26 @@ namespace E_AuctionOnline.Controllers
             }
             return Ok(listcategory);
         }
-
+      
+        [Route("getlistItem")]
+        [HttpGet]
+        public async Task<IActionResult> getlistItem([FromQuery] int page, [FromQuery] int pagesize )
+        {
+            var listitem = await _user.getListItem(page, pagesize);
+            if (listitem.Item1 == null)
+            {
+                return BadRequest(new
+                {
+                    message = "Fail Actions"
+                });
+            }
+            return Ok(new
+            {
+                listitem = listitem.Item1,
+                ItemCount = listitem.Item2
+            });
+        }
+        //
         [Route("getProfile")]
         [HttpPost]
         public async Task<IActionResult> getProfile(string email)

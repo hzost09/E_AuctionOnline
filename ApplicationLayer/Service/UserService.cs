@@ -26,6 +26,33 @@ namespace ApplicationLayer.Service
             _d = d;
             _r = r;
         }
+        //get list item
+        public async Task<(IList<ItemModel>, int)> getListItem(int page, int pagesize)
+        {
+            var totalcount = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller).ToListAsync();
+            var totalPage = (int)Math.Ceiling((decimal)totalcount.Count / pagesize);
+            var ItemPerPage = totalcount.Skip((page - 1) * pagesize)
+                                         .Take(pagesize)
+                                         .ToList();
+            var listItem = new List<ItemModel>();
+            foreach (var item in ItemPerPage)
+            {
+                var itemmodel = new ItemModel();
+                itemmodel.Id = item.Id;
+                itemmodel.Name = item.Name;
+                itemmodel.Description = item.Description;
+                itemmodel.Email = item.Seller.Email;
+                itemmodel.Image = item.Image;
+                itemmodel.BeginPrice = item.BeginPrice;
+                itemmodel.UpPrice = item.UpPrice;
+                itemmodel.WinningPrice = item.WinningPrice;
+                itemmodel.BeginDate = item.BeginDate;
+                itemmodel.EndDate = item.EndDate;
+                listItem.Add(itemmodel);
+            }
+            return (listItem, totalcount.Count);
+        }
+
         // get category list
         public async Task<IList<Category>> sendcategorylist()
         {

@@ -20,7 +20,7 @@ namespace DomainLayer.Core.Enities.helper
                     <body>
                         <div>
                             <h3>reset</h3>
-                            <a href=""{ClientUrl}/reset_password?email={email}&code={emailToken}"" target=""_blank"">ResetPassword</a>    
+                            <a href=""{ClientUrl}/reset?email={email}&code={emailToken}"" target=""_blank"">ResetPassword</a>    
                         </div>
                     </body>
                 </html>";

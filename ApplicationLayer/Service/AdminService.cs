@@ -48,7 +48,7 @@ namespace ApplicationLayer.Service
         }
 
         //listitem with DTO model
-        public async Task<IList<ItemModel>> getListItem(int page, int pagesize)
+        public async Task<(IList<ItemModel>,int)> getListItem(int page, int pagesize)
         {
             var totalcount = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller).ToListAsync();
             var totalPage = (int)Math.Ceiling((decimal)totalcount.Count / pagesize);
@@ -65,7 +65,7 @@ namespace ApplicationLayer.Service
                 itemmodel.Email = item.Seller.Email;
                 listItem.Add(itemmodel);
             }
-            return listItem;
+            return (listItem,totalcount.Count);
         }
 
         //wait for Font-end to check again
@@ -173,7 +173,17 @@ namespace ApplicationLayer.Service
 
         }
 
-        // get category with item list
+        //listcategory
+        public async Task<IList<Category>> categorylist()
+        {
+            try {
+                var listcategory = await _u.Repository<Category>().ListEntities();
+                return listcategory;
+            }
+            catch (Exception ex) {
+                return null;
+            }
+        }
 
         //update category 
         public async Task<(Category, string)> UpdateCategory(Category cate)

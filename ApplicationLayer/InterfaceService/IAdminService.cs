@@ -11,7 +11,8 @@ namespace ApplicationLayer.InterfaceService
     public interface IAdminService
     {
         Task<(IDictionary<User, int>, int)> getListUser(int page, int pagesize);
-        Task<IList<ItemModel>> getListItem(int page, int pagesize);
+        Task<(IList<ItemModel>,int)> getListItem(int page, int pagesize);
+        Task<IList<Category>> categorylist();
         Task<(Item, IList<(Category, bool)>)> GetOneItemWithListCategory(int id);
         Task<IList<ItemModel>> SearchbyName(string name);
         Task<(bool,string)> LockOrUnlockUser(int id);

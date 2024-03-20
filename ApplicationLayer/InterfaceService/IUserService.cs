@@ -11,6 +11,7 @@ namespace ApplicationLayer.InterfaceService
 {
     public interface IUserService
     {
+        Task<(IList<ItemModel>, int)> getListItem(int page, int pagesize);
         Task<IList<Category>> sendcategorylist();
         Task<int> UpdateUser(UserModel model);
         Task<User> GetUserProfile(string email);
@@ -21,8 +22,6 @@ namespace ApplicationLayer.InterfaceService
         Task<ItemModel> getOneItem(int id);
         Task<(bool, string)> RattingUser(string name, RateBuyerModel model);
         Task<bool> AuctionEnd(int Itemid);
-        //Task<IList<CateItem>> testarray(CategoryModel[] model);
-
 
     }
 }

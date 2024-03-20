@@ -31,6 +31,7 @@ namespace ApplicationLayer.Service
                 if (findUser == null)
                 {
                     return (null, "User not Found");
+
                 }
                 if (findUser.EmailConfirm == false)
                 {
