@@ -1,18 +1,15 @@
 ﻿using ApplicationLayer.DTO;
 using ApplicationLayer.InterfaceService;
-using ApplicationLayer.Validation.BidValid;
 using ApplicationLayer.Validation.ItemValid;
 using ApplicationLayer.Validation.UserValid;
 using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Ocsp;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
@@ -24,17 +21,12 @@ namespace E_AuctionOnline.Controllers
     {
         private readonly IUserService _user;
         private readonly IUnitOfWork _u;
-        private readonly IResetEmailService _r;
-        private readonly IJwtService _j;
-        public UserController(IUserService user, IUnitOfWork u, IResetEmailService r, IJwtService j)
+        public UserController(IUserService user, IUnitOfWork u)
         {
             _user = user;
             _u = u;
-            _r = r;
-            _j = j;
         }
-        
-        
+
         [Route("getlistcategory")]
         [HttpGet]
         public async Task<IActionResult> getlistCategory()
@@ -49,26 +41,7 @@ namespace E_AuctionOnline.Controllers
             }
             return Ok(listcategory);
         }
-      
-        [Route("getlistItem")]
-        [HttpGet]
-        public async Task<IActionResult> getlistItem([FromQuery] int page, [FromQuery] int pagesize )
-        {
-            var listitem = await _user.getListItem(page, pagesize);
-            if (listitem.Item1 == null)
-            {
-                return BadRequest(new
-                {
-                    message = "Fail Actions"
-                });
-            }
-            return Ok(new
-            {
-                listitem = listitem.Item1,
-                ItemCount = listitem.Item2
-            });
-        }
-        //
+
         [Route("getProfile")]
         [HttpPost]
         public async Task<IActionResult> getProfile(string email)
@@ -82,8 +55,6 @@ namespace E_AuctionOnline.Controllers
         }
 
         // need send new AccessToken to Client
-        //User
-        [Authorize(Roles = "User")]
         [Route("UpdateUser")]
         [HttpPost]
         public async Task<IActionResult> UpdateUser([FromForm]UserModel model)
@@ -106,14 +77,12 @@ namespace E_AuctionOnline.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { message = ex.Message.ToString() });
+                return BadRequest(ex.Message);
             }
            
         }
 
-        //User
-        [Authorize(Roles = "User")]
-        [Route("GetListItemOfUser/{id}")]
+        [Route("GetListItem/{id}")]
         [HttpGet]            
         public async Task<IActionResult> ListItemWithUserId(int id)
         {
@@ -138,9 +107,7 @@ namespace E_AuctionOnline.Controllers
             }
             return Ok(listsearch);
         }
-        
-        //User
-        [Authorize(Roles = "User")]
+
         [Route("SellItem")]
         [HttpPost]
         [Consumes("multipart/form-data")]
@@ -167,7 +134,7 @@ namespace E_AuctionOnline.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { message = ex.Message.ToString() });
+                return BadRequest(ex.Message);
             }
 
         }
@@ -188,91 +155,13 @@ namespace E_AuctionOnline.Controllers
             return File(bytes, contenttype, Path.GetFileName(filepath));
         }
 
-        //User
-        [Authorize(Roles = "User")]
-        [Route("Placebid")]
+        [Route("test")]
         [HttpPost]
-        public async Task<IActionResult> PlaceBid(BidModel model)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Test([FromForm] SellItemRequest categoryModels)
         {
-            try
-            {
-                var checkbidmodel = new BidValid();
-                checkbidmodel.AddValidator(new BidAmountValid(_u));
-                checkbidmodel.AddValidator(new BidTimeValid(_u));
-                checkbidmodel.AddValidator(new BidWinnerValid(_u));
-                await checkbidmodel.ActionValid(model);
-                var result = await _user.PlaceBid(model);
-                if (result.Item1.WinnerId != 0)
-                {
-                    await _user.AuctionEnd(model.ItemId);  
-                    return Ok(new
-                    {
-                        message = result.Item2
-                    });
-                }                
-                return Ok(new
-                {
-                    message = result.Item2
-                });
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest(new { messsage = e.Message.ToString() });
-            }
+            return Ok(categoryModels.CategoryModel);
         }
-
-        [Route("GetOneItem/{id}")]
-        [HttpGet]
-        public async Task<IActionResult> GetOneItem(int id)
-        {
-            var result = await _user.getOneItem(id);
-            if (result == null )
-            {
-                return NotFound(new
-                {
-                    message = "Cant Found Item"
-                });
-            }
-            return Ok(result);
-        }
-
-
-        [Route("Rating")]
-        [HttpPost]
-        [Authorize(Roles = "User")]
-        public async Task<IActionResult> Ratting([FromBody] RateBuyerModel req)
-        {
-            var token = HttpContext.Request.Headers["Authorization"];
-            var username = _j.dataFormToken(token);
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { message = ModelState.ToString() });
-            }
-            var RateAction = await _user.RattingUser(username, req);
-            if (RateAction.Item1 == false)
-            {
-                return BadRequest(new
-                {
-                    message = RateAction.Item2
-                });
-            }
-            else
-            {
-                return Ok(new
-                {
-                    message = RateAction.Item2
-                });
-            }
-        }
-
-
-        //[Route("test")]
-        //[HttpPost]
-        //[Consumes("multipart/form-data")]
-        //public async Task<IActionResult> Test([FromForm] SellItemRequest categoryModels)
-        //{
-        //    return Ok(categoryModels.CategoryModel);
-        //}
 
     }
 }

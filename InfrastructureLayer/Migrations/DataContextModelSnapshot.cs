@@ -36,7 +36,7 @@ namespace InfrastructureLayer.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<float?>("HighestBid")
+                    b.Property<float>("HighestBid")
                         .HasColumnType("real");
 
                     b.Property<int>("ItemId")
@@ -53,68 +53,6 @@ namespace InfrastructureLayer.Migrations
                     b.HasIndex("WinnerId");
 
                     b.ToTable("AuctionHistory");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            HighestBid = 10f,
-                            ItemId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            HighestBid = 10f,
-                            ItemId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            HighestBid = 10f,
-                            ItemId = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            HighestBid = 10f,
-                            ItemId = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            HighestBid = 10f,
-                            ItemId = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            HighestBid = 10f,
-                            ItemId = 6
-                        },
-                        new
-                        {
-                            Id = 7,
-                            HighestBid = 10f,
-                            ItemId = 7
-                        },
-                        new
-                        {
-                            Id = 8,
-                            HighestBid = 10f,
-                            ItemId = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            HighestBid = 10f,
-                            ItemId = 9
-                        },
-                        new
-                        {
-                            Id = 10,
-                            HighestBid = 10f,
-                            ItemId = 10
-                        });
                 });
 
             modelBuilder.Entity("DomainLayer.Core.Enities.Bid", b =>
@@ -655,18 +593,6 @@ namespace InfrastructureLayer.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
-                    b.Property<float>("Rate")
-                        .HasColumnType("real");
-
-                    b.Property<int>("RateUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RatedUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RatingDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
 
@@ -675,9 +601,8 @@ namespace InfrastructureLayer.Migrations
                     b.HasIndex("ItemId")
                         .IsUnique();
 
-                    b.HasIndex("RateUserId");
-
-                    b.HasIndex("SellerId");
+                    b.HasIndex("SellerId")
+                        .IsUnique();
 
                     b.ToTable("Ratingtb");
                 });
@@ -729,9 +654,6 @@ namespace InfrastructureLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("EmailConfirm")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -756,7 +678,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 1,
                             Email = "User1@gmail.com",
-                            EmailConfirm = false,
                             Name = "User1",
                             Password = "User1234",
                             Role = "User"
@@ -765,7 +686,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 2,
                             Email = "User2@gmail.com",
-                            EmailConfirm = false,
                             Name = "User2",
                             Password = "User1234",
                             Role = "User"
@@ -774,7 +694,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 3,
                             Email = "User3@gmail.com",
-                            EmailConfirm = false,
                             Name = "User3",
                             Password = "User1234",
                             Role = "User"
@@ -783,7 +702,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 4,
                             Email = "User4@gmail.com",
-                            EmailConfirm = false,
                             Name = "User4",
                             Password = "User1234",
                             Role = "User"
@@ -792,7 +710,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 5,
                             Email = "User5@gmail.com",
-                            EmailConfirm = false,
                             Name = "User5",
                             Password = "User1234",
                             Role = "User"
@@ -801,7 +718,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 6,
                             Email = "User6@gmail.com",
-                            EmailConfirm = false,
                             Name = "User6",
                             Password = "User1234",
                             Role = "User"
@@ -810,7 +726,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 7,
                             Email = "User7@gmail.com",
-                            EmailConfirm = false,
                             Name = "User7",
                             Password = "User1234",
                             Role = "User"
@@ -819,7 +734,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 8,
                             Email = "User8@gmail.com",
-                            EmailConfirm = false,
                             Name = "User8",
                             Password = "User1234",
                             Role = "User"
@@ -828,7 +742,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 9,
                             Email = "User@gmail.com",
-                            EmailConfirm = false,
                             Name = "User9",
                             Password = "User1234",
                             Role = "User"
@@ -837,7 +750,6 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 10,
                             Email = "User10@gmail.com",
-                            EmailConfirm = false,
                             Name = "User10",
                             Password = "User1234",
                             Role = "User"
@@ -846,45 +758,10 @@ namespace InfrastructureLayer.Migrations
                         {
                             Id = 11,
                             Email = "Admin@gmail.com",
-                            EmailConfirm = true,
                             Name = "Admin",
                             Password = "Admin1234",
                             Role = "Admin"
                         });
-                });
-
-            modelBuilder.Entity("DomainLayer.Core.VerifyEmail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("BeginDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VerifyToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("VerifyEmail");
                 });
 
             modelBuilder.Entity("DomainLayer.Core.Enities.AuctionHistory", b =>
@@ -990,23 +867,15 @@ namespace InfrastructureLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DomainLayer.Core.Enities.User", "RateUser")
-                        .WithMany("Rater")
-                        .HasForeignKey("RateUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("DomainLayer.Core.Enities.User", "seller")
-                        .WithMany("BeingRateds")
-                        .HasForeignKey("SellerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("DomainLayer.Core.Enities.User", "User")
+                        .WithOne("Rating")
+                        .HasForeignKey("DomainLayer.Core.Enities.Rating", "SellerId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Item");
 
-                    b.Navigation("RateUser");
-
-                    b.Navigation("seller");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DomainLayer.Core.Enities.ReFreshToken", b =>
@@ -1016,15 +885,6 @@ namespace InfrastructureLayer.Migrations
                         .HasForeignKey("DomainLayer.Core.Enities.ReFreshToken", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DomainLayer.Core.VerifyEmail", b =>
-                {
-                    b.HasOne("DomainLayer.Core.Enities.User", "User")
-                        .WithOne("Verifyemail")
-                        .HasForeignKey("DomainLayer.Core.VerifyEmail", "UserId");
 
                     b.Navigation("User");
                 });
@@ -1056,16 +916,11 @@ namespace InfrastructureLayer.Migrations
                 {
                     b.Navigation("AuctionHistories");
 
-                    b.Navigation("BeingRateds");
-
                     b.Navigation("EmailToken");
 
-                    b.Navigation("Rater");
+                    b.Navigation("Rating");
 
                     b.Navigation("ReFreshToken");
-
-                    b.Navigation("Verifyemail")
-                        .IsRequired();
 
                     b.Navigation("bids");
 
