@@ -2,6 +2,7 @@
 using ApplicationLayer.InterfaceService;
 using ApplicationLayer.Validation.LoginValid;
 using ApplicationLayer.Validation.RegisterValid;
+using DomainLayer.Imterface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -15,11 +16,14 @@ namespace E_AuctionOnline.Controllers
     {
         private readonly IAuthService _auth;
         private readonly IJwtService _j;
-        public AuthController(IAuthService auth, IJwtService j)
+        private readonly IUnitOfWork _u;
+        private readonly IResetEmailService _r;
+        public AuthController(IAuthService auth, IJwtService j,IUnitOfWork u,IResetEmailService r)
         {
             _auth = auth;
             _j = j; 
-
+            _u = u; 
+            _r = r;
         }
 
         [Route("SignIn")]
@@ -54,8 +58,8 @@ namespace E_AuctionOnline.Controllers
 
             }
             catch (ValidationException ex)
-            {
-                return BadRequest(ex.Message);
+            {           
+                return BadRequest(new { message = ex.Message.ToString() });
             }
 
         }
@@ -68,7 +72,7 @@ namespace E_AuctionOnline.Controllers
             {
                 var signUpvalidator = new SignUpValidate();
                 signUpvalidator.AddValidator(new SignUpUserNameValidate());
-                signUpvalidator.AddValidator(new SignUpEmailValidate());
+                signUpvalidator.AddValidator(new SignUpEmailValidate(_u));
                 signUpvalidator.AddValidator(new SignUpPaswordValidate());
                 await signUpvalidator.ActionValid(model);
                 var signUpAction = await _auth.Register(model);
@@ -81,6 +85,9 @@ namespace E_AuctionOnline.Controllers
                 }
                 else
                 {
+                    var createVerifyToken = await _j.createVerifytoken(model.Email);
+                    var mailmodel = await _r.SendEmailtoVerify(createVerifyToken);
+                     _r.sendMail(mailmodel);
                     return Ok(new
                     {
                         message = signUpAction.Item2
@@ -89,8 +96,79 @@ namespace E_AuctionOnline.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
+        }
+        [Route("checkemailandsendlink")]
+        [HttpPost]
+        public async Task<IActionResult> checkemailandsendlink([FromBody]EmailDTOmodel model)
+        {
+            var checkEmail = await _r.CheckEmailAndTokenEmail(model.Email);
+            if (checkEmail == null)
+            {
+                return BadRequest(new
+                {
+                    message = "No Email exit"
+                });
+            }
+            if (_r.sendMail(checkEmail))
+            {
+                return Ok(new
+                {
+                    message = "Success Action"
+                });
+            }
+            else
+            {
+                return BadRequest(new
+                {
+                    message = "Fail to send Reset link"
+                });
+            }
+        }
+
+        [Route("ResetPassword")]
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPassWordModel model)
+        {
+            var checkPasswordReset = await _r.checkTokenEmailAndSaveNewPassword(model);
+            if (checkPasswordReset == 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Fail Action"
+                });
+            }
+            else if (checkPasswordReset == 1)
+            {
+                return Ok(new
+                {
+                    message = "Success Action"
+                });
+            }
+            else if (checkPasswordReset == -1)
+            {
+                return BadRequest(new
+                {
+                    message = "Token Expire Or invalid Token"
+                });
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("verify")]
+        [HttpPost]
+        public async Task<IActionResult> verifyEmail(verifymodel model)
+        {
+            var result = await _auth.confrimVerify(model);
+            if (result.Item1 == -1)
+            {
+                return BadRequest();
+            }
+            return Ok(result.Item2);
         }
     }
 }

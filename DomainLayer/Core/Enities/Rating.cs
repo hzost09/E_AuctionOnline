@@ -13,11 +13,22 @@ namespace DomainLayer.Core.Enities
 
         //making relationship           
         [ForeignKey("ItemId")]
-        public Item Item { get; set;}   
+        public Item? Item { get; set;}   
         public int ItemId { get; set; }
 
+        //be rated
         [ForeignKey("SellerId")]
-        public User User { get; set; }
-        public int SellerId { get; set; } 
+        [InverseProperty("BeingRateds")]
+        public User? seller { get; set; }
+        public int SellerId { get; set; }
+
+        // rate other
+        [ForeignKey("RatedUserId")] 
+        [InverseProperty("Rater")]
+        public User? RateUser { get; set; }
+        public int RateUserId { get; set; }
+
+        public float Rate { get; set; }
+        public DateTime RatingDate { get; set; }
     }
 }
