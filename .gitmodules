@@ -1,0 +1,3 @@
+[submodule "ClientApp"]
+	path = ClientApp
+	url = https://github.com/hzost09/E_AuctionOnline_Front_End.git
