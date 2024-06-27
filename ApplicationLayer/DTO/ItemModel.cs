@@ -22,6 +22,7 @@ namespace ApplicationLayer.DTO
         public string? Image { get; set; }
         public string? Document { get; set; }
         public int? sellerId { get; set; }
+        public List<string>? categoryName { get; set; }
 
         public IFormFile? ImageFile { get; set; }
 

@@ -2,6 +2,7 @@
 using DomainLayer.Core;
 using InfrastructureLayer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -18,6 +19,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     //x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -41,11 +43,11 @@ builder.Services.AddAuthentication(x =>
     x.SaveToken = true;
     //định dạng chính xác việc xét jwt 
     x.TokenValidationParameters = new TokenValidationParameters
-    {      
+    {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings["IssuerSigningKey"])),      
-        ValidateAudience = false,    
-        ValidateIssuer = false,   
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings["IssuerSigningKey"])),
+        ValidateAudience = false,
+        ValidateIssuer = false,
         ClockSkew = TimeSpan.Zero,
     };
 });
@@ -69,8 +71,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("mypolicy");
 app.UseHttpsRedirection();
+app.UseCors("mypolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

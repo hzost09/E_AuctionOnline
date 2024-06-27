@@ -151,7 +151,7 @@ namespace ApplicationLayer.Service
                 return null;
             }
         }
-        public async Task<EmailModel> sendMailForSuccessSeller(int? sellerId, int? buyerId,string itemName)
+        public async Task<EmailModel> sendMailForSuccessSeller( int? buyerId,int? sellerId,string itemName)
         {
             try
             {

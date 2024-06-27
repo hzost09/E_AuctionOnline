@@ -84,11 +84,14 @@ namespace ApplicationLayer.Validation.ItemValid
     {
         public async Task<(bool, string)> validateItemChain(ItemModel model)
         {
+            DateTime now = DateTime.Now;
+            DateTime truncatedDateTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
+
             if (model.BeginDate == null || model.EndDate == null )
             {
                 throw new ValidationException("required");
             }
-            if (model.BeginDate < DateTime.Now)
+            if (model.BeginDate < truncatedDateTime)
             {
                 throw new ValidationException("EndDate cannot lower than today");
             }
@@ -99,4 +102,4 @@ namespace ApplicationLayer.Validation.ItemValid
             return (true, "");
         }
     }
-}
+}       

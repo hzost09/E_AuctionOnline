@@ -37,7 +37,6 @@ namespace InfrastructureLayer.Repos
             var Entities = await _data.Set<T>().FindAsync(id);
             return Entities;
         }
-
         //Create
         public async Task<T> Create(T entity)
         {

@@ -27,7 +27,7 @@ namespace ApplicationLayer.Service
         {
             try
             {            
-                var findUser = await _Iu.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == model.Email);
+                var findUser = await _Iu.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == model.Email && x.Password == model.Password);
                 if (findUser == null)
                 {
                     return (null, "User not Found");

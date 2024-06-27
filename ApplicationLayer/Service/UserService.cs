@@ -3,6 +3,7 @@ using ApplicationLayer.InterfaceService;
 using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Ocsp;
 using System;
@@ -27,15 +28,48 @@ namespace ApplicationLayer.Service
             _r = r;
         }
         //get list item
+        //public async Task<(IList<ItemModel>, int)> getListItem(int page, int pagesize)
+        //{
+
+
+        //    var totalcount = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller).Include(x => x.cateItems).ThenInclude(x => x.category).ToListAsync();
+        //    var totalPage = (int)Math.Ceiling((decimal)totalcount.Count / pagesize);
+        //    var itemPerPage = totalcount.Skip((page - 1) * pagesize)
+        //                                 .Take(pagesize)
+        //                                 .ToList();
+        //    var listItem = new List<ItemModel>();
+        //    foreach (var item in itemPerPage)
+        //    {
+        //        var itemmodel = new ItemModel();
+        //        itemmodel.Id = item.Id;
+        //        itemmodel.Name = item.Name;
+        //        itemmodel.Description = item.Description;
+        //        itemmodel.Email = item.Seller.Email;
+        //        itemmodel.Image = item.Image;
+        //        itemmodel.BeginPrice = item.BeginPrice;
+        //        itemmodel.UpPrice = item.UpPrice;
+        //        itemmodel.WinningPrice = item.WinningPrice;
+        //        itemmodel.BeginDate = item.BeginDate;
+        //        itemmodel.EndDate = item.EndDate;
+        //        itemmodel.categoryName = item.;
+        //        listItem.Add(itemmodel);
+        //    }
+        //    return (listItem, totalcount.Count);
+        //}
         public async Task<(IList<ItemModel>, int)> getListItem(int page, int pagesize)
         {
-            var totalcount = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller).ToListAsync();
+            var totalcount = await _u.Repository<Item>().EntitiesCondition()
+                                              .Include(x => x.Seller)
+                                              .Include(x => x.cateItems)
+                                                .ThenInclude(ci => ci.category) // Include category từ cateItems
+                                              .ToListAsync();
+
             var totalPage = (int)Math.Ceiling((decimal)totalcount.Count / pagesize);
-            var ItemPerPage = totalcount.Skip((page - 1) * pagesize)
-                                         .Take(pagesize)
-                                         .ToList();
+            var itemPerPage = totalcount.Skip((page - 1) * pagesize)
+                                        .Take(pagesize)
+                                        .ToList();
             var listItem = new List<ItemModel>();
-            foreach (var item in ItemPerPage)
+            foreach (var item in itemPerPage)
             {
                 var itemmodel = new ItemModel();
                 itemmodel.Id = item.Id;
@@ -48,6 +82,7 @@ namespace ApplicationLayer.Service
                 itemmodel.WinningPrice = item.WinningPrice;
                 itemmodel.BeginDate = item.BeginDate;
                 itemmodel.EndDate = item.EndDate;
+                itemmodel.categoryName = item.cateItems.Select(ci => ci.category.Name).ToList();
                 listItem.Add(itemmodel);
             }
             return (listItem, totalcount.Count);
@@ -142,34 +177,84 @@ namespace ApplicationLayer.Service
         }
 
         //search item by Name Or by category or both
-        public async Task<IList<Item>> searchCombine(string itemname, string categoryname)
+        public async Task<IList<ItemModel>> searchCombine(string itemName, string categoryName)
         {
             try
             {
-                var ListItem = new List<Item>();
-                if (itemname != "" && categoryname == "")
+                var listItem = new List<Item>();
+                var listItemModel = new List<ItemModel>();
+                if (itemName == null && categoryName == null)
                 {
-                    ListItem = await _u.Repository<Item>().EntitiesCondition()
-                        .Where(x => x.Name.Contains(itemname))
-                        .Select(x => new Item { Id = x.Id, Name = x.Name, Description = x.Description })
+                    listItem = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller)
+                        .Include(x => x.cateItems)
+                         .ThenInclude(ci => ci.category)
                         .ToListAsync();
+                    foreach (var item in listItem)
+                    {
+                        var itemmodel = new ItemModel();
+                        itemmodel.Id = item.Id;
+                        itemmodel.Name = item.Name;
+                        itemmodel.Description = item.Description;
+                        itemmodel.Email = item.Seller.Email;
+                        itemmodel.Image = item.Image;
+                        itemmodel.BeginPrice = item.BeginPrice;
+                        itemmodel.UpPrice = item.UpPrice;
+                        itemmodel.WinningPrice = item.WinningPrice;
+                        itemmodel.BeginDate = item.BeginDate;
+                        itemmodel.EndDate = item.EndDate;
+                        itemmodel.categoryName = item.cateItems.Select(ci => ci.category.Name).ToList();
+                        listItemModel.Add(itemmodel);
+                    }
+                    return listItemModel;
                 }
-                if (itemname == "" && categoryname != "")
+                if (itemName == null && categoryName != "")
                 {
-                    var cate = await _u.Repository<Category>().EntitiesCondition().FirstOrDefaultAsync(x => x.Name.Contains(categoryname));
+                    var cate = await _u.Repository<Category>().EntitiesCondition().FirstOrDefaultAsync(x => x.Name.Contains(categoryName));
                     var listCateItem = await _u.Repository<CateItem>().EntitiesCondition().Where(x => x.CateId == cate.Id).ToListAsync();
                     var listItemId = listCateItem.Select(x => x.ItemId).ToList();
-                    ListItem = await _u.Repository<Item>().EntitiesCondition().Where(x => listItemId.Contains(x.Id)).ToListAsync();
+                    listItem = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller).Where(x => listItemId.Contains(x.Id)).ToListAsync();
+                    foreach (var item in listItem)
+                    {
+                        var itemmodel = new ItemModel();
+                        itemmodel.Id = item.Id;
+                        itemmodel.Name = item.Name;
+                        itemmodel.Description = item.Description;
+                        itemmodel.Email = item.Seller.Email;
+                        itemmodel.Image = item.Image;
+                        itemmodel.BeginPrice = item.BeginPrice;
+                        itemmodel.UpPrice = item.UpPrice;
+                        itemmodel.WinningPrice = item.WinningPrice;
+                        itemmodel.BeginDate = item.BeginDate;
+                        itemmodel.EndDate = item.EndDate;
+                        itemmodel.categoryName = item.cateItems.Select(ci => ci.category.Name).ToList();
+                        listItemModel.Add(itemmodel);
+                    }
+                    return listItemModel;
                 }
-                if (itemname != "" && categoryname != "")
-                {
-                    var cate = await _u.Repository<Category>().EntitiesCondition().FirstOrDefaultAsync(x => x.Name.Contains(categoryname));
-                    var listCateItem = await _u.Repository<CateItem>().EntitiesCondition().Where(x => x.CateId == cate.Id).ToListAsync();
-                    var listItemId = listCateItem.Select(x => x.ItemId).ToList();
-                    var ListItemBaseId = await _u.Repository<Item>().EntitiesCondition().Where(x => listItemId.Contains(x.Id)).ToListAsync();
-                    ListItem = await _u.Repository<Item>().EntitiesCondition().Where(x => x.Name.Contains(itemname)).ToListAsync();
+                if (itemName != null && categoryName == null)
+                {                                      
+                    listItem = await _u.Repository<Item>().EntitiesCondition().Where(x => x.Name.Contains(itemName))
+                        .Include(x => x.cateItems)
+                        .Include(x => x.Seller).ToListAsync();
+                    foreach (var item in listItem)
+                    {
+                        var itemmodel = new ItemModel();
+                        itemmodel.Id = item.Id;
+                        itemmodel.Name = item.Name;
+                        itemmodel.Description = item.Description;
+                        itemmodel.Email = item.Seller.Email;
+                        itemmodel.Image = item.Image;
+                        itemmodel.BeginPrice = item.BeginPrice;
+                        itemmodel.UpPrice = item.UpPrice;
+                        itemmodel.WinningPrice = item.WinningPrice;
+                        itemmodel.BeginDate = item.BeginDate;
+                        itemmodel.EndDate = item.EndDate;
+                        itemmodel.categoryName = item.cateItems.Select(ci => ci.category.Name).ToList();
+                        listItemModel.Add(itemmodel);
+                    }
+                    return listItemModel;
                 }
-                return ListItem;
+                return null;
             }
             catch (Exception ex)
             {
@@ -241,14 +326,20 @@ namespace ApplicationLayer.Service
                 await _u.Repository<Bid>().Create(newbid);
 
                 await _u.SaveChangesAsync();
+                if (takeAuctionhistory.WinnerId != null)
+                {
+                    return (takeAuctionhistory, "winner exits");
+                }
 
                 if (model.BidAmount >= takeitem.WinningPrice)
                 {
+                    takeAuctionhistory.HighestBid = model.BidAmount;
                     takeAuctionhistory.WinnerId = model.UserId;
                     _u.Repository<AuctionHistory>().UpDate(takeAuctionhistory);
                     await _u.SaveChangesAsync();
-                    return (takeAuctionhistory, "winner here");
+                    return (takeAuctionhistory, "you are the winner");
                 }
+                
                 // update bidAmout for Auction history 
                 takeAuctionhistory.HighestBid = model.BidAmount;
                 _u.Repository<AuctionHistory>().UpDate(takeAuctionhistory);
@@ -261,12 +352,35 @@ namespace ApplicationLayer.Service
             }
         }
 
+        //take all bid base on id item
+
+        public async Task<(List<Bid>,string)> getAllBid(int itemId)
+        {
+            try
+            {
+                //find all bid have item id
+                List<Bid> listBid = await _u.Repository<Bid>().EntitiesCondition().Where(x => x.ItemId == itemId)
+                    .Include(x => x.User)
+                    .ToListAsync();
+                listBid.Select(b => b.User?.Avatar).ToList();
+                return (listBid,"success");
+            }
+            catch (Exception e)
+            {            
+                return (null,"error");
+            }
+        }
+
         // take one item
         public async Task<ItemModel> getOneItem(int id)
         {
             try
             {
-                var getitem = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller).FirstOrDefaultAsync(x => x.Id == id);
+                var getitem = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Seller)
+                                       
+                                        .Include(x => x.cateItems)
+                                         .ThenInclude(x => x.category)
+                                        .FirstOrDefaultAsync(x => x.Id == id);
                 ItemModel model = new ItemModel();
                 if (getitem != null)
                 {
@@ -281,7 +395,9 @@ namespace ApplicationLayer.Service
                     model.Email = getitem.Seller.Email;
                     model.sellerId = getitem.sellerId;
                     model.BeginDate = getitem.BeginDate;
+                    model.categoryName = getitem.cateItems.Select(x => x.category.Name).ToList();
                     model.EndDate = getitem.EndDate;
+                    model.Document = getitem.Document;
                 }
                 return model;
             }
@@ -323,12 +439,7 @@ namespace ApplicationLayer.Service
             }
         }
 
-        //
-        //public async Task<> GetAuctionHistory(string name, int id)
-        //{
-        //    var takeuser = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Name == name);
-
-        //}
+      
         public async Task<bool> AuctionEnd(int Itemid)
         {
             try
@@ -343,8 +454,8 @@ namespace ApplicationLayer.Service
                 var winner = takeItem.Auctionhistory.WinnerId;
                 var seller = takeItem.sellerId;
                 var itemname = takeItem.Name;
-                await _r.sendMailForSuccessBuyer(winner, seller, itemname);
-                await _r.sendMailForSuccessSeller(winner, seller, itemname);
+                _r.sendMail(await _r.sendMailForSuccessSeller(winner, seller, itemname));
+                _r.sendMail(await _r.sendMailForSuccessBuyer(winner, seller, itemname));              
                 return true;
             }
             catch (Exception e)
@@ -355,3 +466,4 @@ namespace ApplicationLayer.Service
         }
     }
 }
+

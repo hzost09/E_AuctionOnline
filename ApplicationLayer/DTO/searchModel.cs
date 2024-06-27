@@ -9,9 +9,9 @@ namespace ApplicationLayer.DTO
 {
     public class searchModel
     {
-        [Required(ErrorMessage = "Item name required")]
-        public string ItemName { get; set; }
-        [Required(ErrorMessage = "Category required")]
-        public string CategoryName { get; set; } 
+ 
+        public string? itemName { get; set; }
+     
+        public string? categoryName { get; set; } 
     }
 }

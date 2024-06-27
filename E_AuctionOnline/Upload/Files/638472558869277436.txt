@@ -1,0 +1,24 @@
+test-75
+
+Z = A button
+X = B button
+C = X button
+V = Y button
+A and S = LB and RB
+D and F = LT and RT
+Q and W = L3 and R3
+Enter is Start
+Arrow keys are Directional buttons
+
+#hidden-table {
+  width: 60%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999; /* Đảm bảo lớp này ở trên cùng */
+}

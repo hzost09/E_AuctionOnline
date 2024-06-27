@@ -22,7 +22,7 @@ namespace ApplicationLayer.Validation.BidValid
         {
             if (model == null || model.ItemId == 0 || model.UserId == 0)
             {
-                throw new ValidationException("there something missing with your request");
+                throw new ValidationException("you not login yet or there is something missing with your request");
             }
             var checkitem = await _u.Repository<Item>().EntitiesCondition().Include(x => x.Auctionhistory).FirstOrDefaultAsync(x => x.Id == model.ItemId);
             var checkbidAmout = await _u.Repository<Bid>().EntitiesCondition().Where(x => x.ItemId == checkitem.Id).ToListAsync();

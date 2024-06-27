@@ -28,17 +28,18 @@ namespace ApplicationLayer.Service
         }
         public async Task<string> CreateToken(User user)
         {
-            // JwtSecurityTokenHandler => cho phép thao tác với token(tạo - gọi method - xác thực)
+        
             var jwtHandeler = new JwtSecurityTokenHandler();
-            // tạo key
+           
             var key = Encoding.ASCII.GetBytes(_config["IssuerSigningKey"]);
-            // tạo playload chứa name và role
+        
        
             var userRole = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Email == user.Email);
             var identity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.Role,userRole.Role),
-                new Claim(ClaimTypes.Name,$"{userRole.Name}")
+                new Claim(ClaimTypes.Name,$"{userRole.Name}"),
+                 new Claim(ClaimTypes.Email,$"{userRole.Email}")
             });
             //tạo chữ ký 
             var cerdential = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
@@ -46,7 +47,7 @@ namespace ApplicationLayer.Service
             var des = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddSeconds(40000),
+                Expires = DateTime.UtcNow.AddSeconds(30),
                 SigningCredentials = cerdential
             };
             var token = jwtHandeler.CreateToken(des);
@@ -63,15 +64,16 @@ namespace ApplicationLayer.Service
             {
                 existingToken.Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
                 existingToken.BeginDate = DateTime.Now;
-                existingToken.EndDate = DateTime.Now.AddSeconds(100);
-                _u.Repository<ReFreshToken>().UpDate(existingToken);
+                existingToken.EndDate = DateTime.Now.AddSeconds(400);
+                _u.Repository<ReFreshToken>().UpDate(existingToken);             
+                await _u.SaveChangesAsync();
                 return existingToken;
             }
             var refreshtoken = new ReFreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 BeginDate = DateTime.Now,
-                EndDate = DateTime.Now.AddSeconds(70000),
+                EndDate = DateTime.Now.AddSeconds(200),
                 UserId = id
             };
             await _u.Repository<ReFreshToken>().Create(refreshtoken);
@@ -86,7 +88,7 @@ namespace ApplicationLayer.Service
         {
             var unquiname = dataFormToken(token);         
             var user = await _u.Repository<User>().EntitiesCondition().FirstOrDefaultAsync(x => x.Name == unquiname);
-            var findTokenWithUserId = await _u.Repository<ReFreshToken>().GetById(user.Id);   
+            var findTokenWithUserId = await _u.Repository<ReFreshToken>().EntitiesCondition().FirstOrDefaultAsync(x => x.UserId == user.Id);   
             if (findTokenWithUserId.Token == null || findTokenWithUserId.EndDate <= DateTime.Now)
             {
                 return null;
