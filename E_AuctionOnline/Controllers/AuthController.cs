@@ -2,6 +2,8 @@
 using ApplicationLayer.InterfaceService;
 using ApplicationLayer.Validation.LoginValid;
 using ApplicationLayer.Validation.RegisterValid;
+using Azure.Core;
+using DomainLayer.Core.Enities;
 using DomainLayer.Imterface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -101,7 +103,7 @@ namespace E_AuctionOnline.Controllers
         }
         [Route("checkemailandsendlink")]
         [HttpPost]
-        public async Task<IActionResult> checkemailandsendlink([FromBody]EmailDTOmodel model)
+        public async Task<IActionResult> checkEmailAndSendlink([FromBody]EmailDTOmodel model)
         {
             var checkEmail = await _r.CheckEmailAndTokenEmail(model.Email);
             if (checkEmail == null)
@@ -169,6 +171,43 @@ namespace E_AuctionOnline.Controllers
                 return BadRequest();
             }
             return Ok(result.Item2);
+        }
+
+       
+        //[HttpPost("checkToken")]
+        //public async Task<IActionResult> checkToken([FromBody] string token)
+        //{
+        //    var newToken = await _j.RefreshAccessToken(token);
+        //    if (newToken.Token == null || newToken.AccessToken == null)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            message = "Cant generate token"
+        //        });
+        //    }
+        //    return Ok(new
+        //    {
+        //        AccessToken = newToken.AccessToken,
+        //        RefreshToken = newToken.Token,
+        //    });;
+        //}
+
+        [HttpPost("checkToken")]
+        public async Task<IActionResult> checkToken([FromBody] RequestTokenModel token)
+        {
+            var newToken = await _j.RefreshAccessToken(token.accessToken);
+            if (newToken == null)
+            {
+                return BadRequest(new
+                {
+                    message = "Cant generate token"
+                });
+            }
+            return Ok(new
+            {
+                AccessToken = newToken.AccessToken,
+                RefreshToken = newToken.Token,
+            });
         }
     }
 }

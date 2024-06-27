@@ -1,4 +1,5 @@
 ﻿using ApplicationLayer.DTO;
+using ApplicationLayer.DTO.testfolder;
 using ApplicationLayer.InterfaceService;
 using ApplicationLayer.Validation.BidValid;
 using ApplicationLayer.Validation.ItemValid;
@@ -20,6 +21,7 @@ namespace E_AuctionOnline.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+  
     public class UserController : ControllerBase
     {
         private readonly IUserService _user;
@@ -49,7 +51,8 @@ namespace E_AuctionOnline.Controllers
             }
             return Ok(listcategory);
         }
-      
+        
+
         [Route("getlistItem")]
         [HttpGet]
         public async Task<IActionResult> getlistItem([FromQuery] int page, [FromQuery] int pagesize )
@@ -69,11 +72,12 @@ namespace E_AuctionOnline.Controllers
             });
         }
         //
-        [Route("getProfile")]
-        [HttpPost]
+        [Authorize(Roles = "User")]
+        [Route("getProfile/{email}")]
+        [HttpGet]
         public async Task<IActionResult> getProfile(string email)
         {
-            var findUser = await _user.GetUserProfile(email);
+            var findUser = await _user.GetUserProfile(email);   
             if (findUser == null)
             {
                 return NotFound(new {message = "cant not find user"});
@@ -118,6 +122,10 @@ namespace E_AuctionOnline.Controllers
         public async Task<IActionResult> ListItemWithUserId(int id)
         {
             var listitem = await _user.getlistItemOfUser(id);
+            if (listitem.Item1 == null || listitem.Item2 == null)
+            {
+                return NotFound(new {message = "List Item Not Found"});
+            }
             return Ok(new { 
                 ListItem = listitem.Item1,
                 ListBid = listitem.Item2,
@@ -126,9 +134,9 @@ namespace E_AuctionOnline.Controllers
 
         [Route("SearchCombine")]
         [HttpPost]
-        public async Task<IActionResult> SearchItemList(searchModel model)
+        public async Task<IActionResult> SearchItemList([FromForm] searchModel model)
         {
-            var listsearch = await _user.searchCombine(model.ItemName,model.CategoryName);
+            var listsearch = await _user.searchCombine(model.itemName,model.categoryName);
             if (listsearch == null || listsearch.Count <= 0)
             {
                 return NotFound(new
@@ -138,23 +146,24 @@ namespace E_AuctionOnline.Controllers
             }
             return Ok(listsearch);
         }
-        
+
         //User
         [Authorize(Roles = "User")]
         [Route("SellItem")]
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> sellItem([FromForm] SellItemRequest model)
-        { 
+        {
+            Console.WriteLine($"Received SellItemRequest: {Newtonsoft.Json.JsonConvert.SerializeObject(model)}");
             try
             {
                 var checkItem = new ItemValid();
-                checkItem.AddValidator(new ItemNameValidate());
-                checkItem.AddValidator(new ItemPriceValidate());
-                checkItem.AddValidator(new ItemImageValidate());
-                checkItem.AddValidator(new ItemDocumentValidate());
-                checkItem.AddValidator(new ItemDateValidate());
-                checkItem.AddValidator(new ItemSellerIdValidate());
+                    checkItem.AddValidator(new ItemNameValidate());
+                    checkItem.AddValidator(new ItemPriceValidate());
+                    checkItem.AddValidator(new ItemImageValidate());
+                    checkItem.AddValidator(new ItemDocumentValidate());
+                    checkItem.AddValidator(new ItemDateValidate());
+                    checkItem.AddValidator(new ItemSellerIdValidate());
                 await checkItem.ActionValid(model.ItemModel);
          
 
@@ -173,7 +182,7 @@ namespace E_AuctionOnline.Controllers
         }
 
         [HttpGet]
-        [Route("DownloadFile")]
+        [Route("DownloadFile/{filename}")]
         public async Task<IActionResult> DownloadFile(string filename)
         {
             var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files", filename);
@@ -185,7 +194,7 @@ namespace E_AuctionOnline.Controllers
             }
 
             var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-            return File(bytes, contenttype, Path.GetFileName(filepath));
+            return File(bytes, contenttype, Path.GetFileName(filepath));              
         }
 
         //User
@@ -206,7 +215,7 @@ namespace E_AuctionOnline.Controllers
                 {
                     await _user.AuctionEnd(model.ItemId);  
                     return Ok(new
-                    {
+                    {   
                         message = result.Item2
                     });
                 }                
@@ -217,7 +226,7 @@ namespace E_AuctionOnline.Controllers
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { messsage = e.Message.ToString() });
+                return BadRequest(new { message = e.Message.ToString() });
             }
         }
 
@@ -236,6 +245,24 @@ namespace E_AuctionOnline.Controllers
             return Ok(result);
         }
 
+        [Route("BidWithItemId/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> getBidListByItemId(int id)
+        {
+            var bidList = await _user.getAllBid(id);
+            if (bidList.Item1 == null)
+            {
+                return NotFound(new 
+                {
+                    message = bidList.Item2
+                });
+            }
+            return Ok(new
+            {
+                message = bidList.Item2,
+                listBid = bidList.Item1
+            });
+        }
 
         [Route("Rating")]
         [HttpPost]
@@ -266,13 +293,6 @@ namespace E_AuctionOnline.Controllers
         }
 
 
-        //[Route("test")]
-        //[HttpPost]
-        //[Consumes("multipart/form-data")]
-        //public async Task<IActionResult> Test([FromForm] SellItemRequest categoryModels)
-        //{
-        //    return Ok(categoryModels.CategoryModel);
-        //}
-
+        
     }
 }
